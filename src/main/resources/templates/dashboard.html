@@ -1,0 +1,202 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Дашборд — Job Assistant</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* Навбар */
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            text-decoration: none;
+        }
+
+        .navbar-brand .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: #4F46E5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            object-fit: cover;
+            background: #E5E7EB;
+        }
+
+        .avatar-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background: #4F46E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            background: transparent;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #6B7280;
+            text-decoration: none;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .logout-btn:hover {
+            background: #F9FAFB;
+            color: #374151;
+        }
+
+        /* Основной контент */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 48px 32px;
+        }
+
+        .welcome-section {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: calc(100vh - 64px - 96px);
+            text-align: center;
+        }
+
+        .welcome-emoji {
+            font-size: 64px;
+            margin-bottom: 24px;
+        }
+
+        .welcome-title {
+            font-size: 36px;
+            font-weight: 700;
+            color: #111827;
+            margin-bottom: 12px;
+        }
+
+        .welcome-title span {
+            color: #4F46E5;
+        }
+
+        .welcome-subtitle {
+            font-size: 18px;
+            color: #6B7280;
+            margin-bottom: 8px;
+        }
+
+        .welcome-email {
+            font-size: 14px;
+            color: #9CA3AF;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Навбар -->
+<nav class="navbar">
+    <a href="/dashboard" class="navbar-brand">
+        <div class="logo-icon">💼</div>
+        Job Assistant
+    </a>
+
+    <div class="navbar-right">
+        <div class="user-info">
+            <!-- Аватар из Google -->
+            <img th:if="${user.picture != null}"
+                 th:src="${user.picture}"
+                 class="avatar"
+                 alt="Аватар"/>
+
+            <!-- Заглушка если нет аватара -->
+            <div th:if="${user.picture == null}" class="avatar-placeholder">
+                <span th:text="${user.name != null ? user.name.substring(0,1).toUpperCase() : '?'}"></span>
+            </div>
+
+            <span class="user-name" th:text="${user.name}">Имя пользователя</span>
+        </div>
+
+        <!-- Кнопка выхода -->
+        <a href="/logout" class="logout-btn">Выйти</a>
+    </div>
+</nav>
+
+<!-- Контент -->
+<div class="container">
+    <div class="welcome-section">
+        <div class="welcome-emoji">👋</div>
+
+        <h1 class="welcome-title">
+            Добро пожаловать, <span th:text="${user.name}">Имя</span>!
+        </h1>
+
+        <p class="welcome-subtitle">
+            Job Assistant готов помочь с поиском работы
+        </p>
+
+        <p class="welcome-email" th:text="${user.email}">
+            email@example.com
+        </p>
+    </div>
+</div>
+
+</body>
+</html>
