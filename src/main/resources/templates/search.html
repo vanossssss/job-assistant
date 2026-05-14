@@ -1,0 +1,759 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Поиск — Job Assistant</title>
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+            color: #111827;
+        }
+
+        .navbar {
+            background: white;
+            border-bottom: 1px solid #E5E7EB;
+            padding: 0 32px;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .navbar-brand {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 18px;
+            font-weight: 700;
+            color: #111827;
+            text-decoration: none;
+        }
+
+        .logo-icon {
+            width: 36px;
+            height: 36px;
+            background: #4F46E5;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+        }
+
+        .navbar-nav {
+            display: flex;
+            gap: 8px;
+        }
+
+        .nav-link {
+            padding: 8px 16px;
+            border-radius: 8px;
+            text-decoration: none;
+            font-size: 14px;
+            font-weight: 500;
+            color: #6B7280;
+            transition: all 0.2s;
+        }
+
+        .nav-link:hover {
+            background: #F3F4F6;
+            color: #111827;
+        }
+
+        .nav-link.active {
+            background: #EEF2FF;
+            color: #4F46E5;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 16px;
+        }
+
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .avatar,
+        .avatar-placeholder {
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+        }
+
+        .avatar {
+            object-fit: cover;
+            background: #E5E7EB;
+        }
+
+        .avatar-placeholder {
+            background: #4F46E5;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 14px;
+            font-weight: 600;
+        }
+
+        .user-name {
+            font-size: 14px;
+            font-weight: 500;
+            color: #374151;
+        }
+
+        .logout-btn {
+            padding: 8px 16px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 14px;
+            color: #6B7280;
+            text-decoration: none;
+        }
+
+        .logout-btn:hover {
+            background: #F9FAFB;
+        }
+
+        .container {
+            max-width: 1050px;
+            margin: 0 auto;
+            padding: 32px 24px;
+        }
+
+        .page-header {
+            margin-bottom: 24px;
+        }
+
+        .page-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 8px;
+        }
+
+        .page-subtitle {
+            font-size: 15px;
+            color: #6B7280;
+        }
+
+        .search-panel {
+            background: white;
+            padding: 20px;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+            margin-bottom: 24px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+        }
+
+        .search-row {
+            display: flex;
+            gap: 12px;
+        }
+
+        .search-input,
+        .location-input {
+            padding: 12px 16px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 10px;
+            font-size: 15px;
+            outline: none;
+        }
+
+        .search-input {
+            flex: 1;
+        }
+
+        .location-input {
+            width: 200px;
+        }
+
+        .search-input:focus,
+        .location-input:focus {
+            border-color: #4F46E5;
+        }
+
+        .search-btn {
+            padding: 12px 28px;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            min-width: 110px;
+        }
+
+        .search-btn:hover {
+            background: #4338CA;
+        }
+
+        .search-btn:disabled {
+            background: #9CA3AF;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            display: none;
+            width: 36px;
+            height: 36px;
+            border: 3px solid #E5E7EB;
+            border-top-color: #4F46E5;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            margin: 40px auto;
+        }
+
+        @keyframes spin {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        .results-info {
+            font-size: 14px;
+            color: #6B7280;
+            margin-bottom: 16px;
+        }
+
+        .results-info span {
+            font-weight: 700;
+            color: #111827;
+        }
+
+        .vacancy-list {
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        .vacancy-card {
+            background: white;
+            border-radius: 14px;
+            padding: 20px;
+            border: 1.5px solid transparent;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            transition: all 0.2s;
+        }
+
+        .vacancy-card:hover {
+            border-color: #E0E7FF;
+            box-shadow: 0 4px 12px rgba(79,70,229,0.08);
+        }
+
+        .card-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 16px;
+            margin-bottom: 8px;
+        }
+
+        .vacancy-title {
+            font-size: 17px;
+            font-weight: 700;
+            color: #111827;
+            text-decoration: none;
+            line-height: 1.35;
+        }
+
+        .vacancy-title:hover {
+            color: #4F46E5;
+        }
+
+        .vacancy-salary {
+            font-size: 15px;
+            font-weight: 700;
+            color: #059669;
+            white-space: nowrap;
+        }
+
+        .card-meta {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .meta-text {
+            font-size: 13px;
+            color: #6B7280;
+        }
+
+        .company {
+            font-size: 14px;
+            font-weight: 600;
+            color: #374151;
+        }
+
+        .badge {
+            padding: 3px 10px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+
+        .badge-source {
+            background: #EEF2FF;
+            color: #4F46E5;
+        }
+
+        .badge-remote {
+            background: #D1FAE5;
+            color: #065F46;
+        }
+
+        .badge-hybrid {
+            background: #FEF3C7;
+            color: #92400E;
+        }
+
+        .badge-office {
+            background: #F3F4F6;
+            color: #374151;
+        }
+
+        .description {
+            font-size: 13px;
+            color: #6B7280;
+            line-height: 1.5;
+            margin-bottom: 12px;
+        }
+
+        .skills {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 14px;
+        }
+
+        .skill {
+            font-size: 12px;
+            padding: 4px 9px;
+            background: #F9FAFB;
+            color: #374151;
+            border: 1px solid #E5E7EB;
+            border-radius: 999px;
+        }
+
+        .card-actions {
+            display: flex;
+            gap: 8px;
+        }
+
+        .btn-open {
+            padding: 8px 14px;
+            border: 1.5px solid #E5E7EB;
+            border-radius: 8px;
+            font-size: 13px;
+            color: #6B7280;
+            text-decoration: none;
+            background: white;
+            font-weight: 600;
+        }
+
+        .btn-open:hover {
+            background: #F9FAFB;
+            color: #374151;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 60px 20px;
+            color: #9CA3AF;
+            background: white;
+            border-radius: 16px;
+            border: 1px solid #E5E7EB;
+        }
+
+        .empty-emoji {
+            font-size: 48px;
+            margin-bottom: 12px;
+        }
+
+        .empty-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #374151;
+        }
+
+        .empty-text {
+            font-size: 14px;
+            margin-top: 6px;
+        }
+
+        .error-banner {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 10px;
+            padding: 14px 18px;
+            color: #DC2626;
+            font-size: 14px;
+            display: none;
+            margin-bottom: 18px;
+        }
+
+        @media (max-width: 800px) {
+            .navbar {
+                height: auto;
+                padding: 16px;
+                flex-direction: column;
+                gap: 12px;
+            }
+
+            .navbar-nav {
+                flex-wrap: wrap;
+                justify-content: center;
+            }
+
+            .search-row {
+                flex-direction: column;
+            }
+
+            .location-input {
+                width: 100%;
+            }
+
+            .card-top {
+                flex-direction: column;
+            }
+
+            .vacancy-salary {
+                white-space: normal;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div th:replace="~{fragments/navbar :: navbar('search')}"></div>
+
+<div class="container">
+    <div class="page-header">
+        <h1 class="page-title">🔍 Поиск вакансий</h1>
+        <p class="page-subtitle">
+            Вакансии собираются из подключённых источников и приводятся к единому формату.
+        </p>
+    </div>
+
+    <div class="search-panel">
+        <div class="search-row">
+            <input type="text"
+                   id="queryInput"
+                   class="search-input"
+                   placeholder="Java Developer, Python, Frontend..."
+                   onkeydown="if(event.key === 'Enter') searchVacancies()"/>
+
+            <input type="text"
+                   id="locationInput"
+                   class="location-input"
+                   placeholder="Москва"/>
+
+            <button id="searchButton" class="search-btn" onclick="searchVacancies()">
+                Найти
+            </button>
+        </div>
+    </div>
+
+    <div class="error-banner" id="errorBanner">
+        ⚠️ Не удалось получить вакансии. Попробуй ещё раз.
+    </div>
+
+    <div class="spinner" id="spinner"></div>
+
+    <div id="resultsSection" style="display:none;">
+        <div class="results-info">
+            Найдено: <span id="resultsCount">0</span> вакансий
+        </div>
+
+        <div class="vacancy-list" id="vacancyList"></div>
+    </div>
+
+    <div class="empty" id="defaultState">
+        <div class="empty-emoji">🔎</div>
+        <div class="empty-title">Введи запрос и нажми «Найти»</div>
+        <div class="empty-text">Например: Java Developer, Backend, Spring Boot</div>
+    </div>
+
+    <div class="empty" id="emptyState" style="display:none;">
+        <div class="empty-emoji">😔</div>
+        <div class="empty-title">Ничего не найдено</div>
+        <div class="empty-text">Попробуй изменить запрос или город</div>
+    </div>
+</div>
+
+<script>
+    async function searchVacancies() {
+        const queryInput = document.getElementById('queryInput');
+        const locationInput = document.getElementById('locationInput');
+        const searchButton = document.getElementById('searchButton');
+
+        const query = queryInput.value.trim();
+        const location = locationInput.value.trim();
+
+        if (!query) {
+            queryInput.focus();
+            return;
+        }
+
+        hide('defaultState');
+        hide('emptyState');
+        hide('resultsSection');
+        hide('errorBanner');
+        show('spinner');
+
+        searchButton.disabled = true;
+        searchButton.textContent = 'Поиск...';
+
+        try {
+            const params = new URLSearchParams({ query });
+
+            if (location) {
+                params.append('location', location);
+            }
+
+            const response = await fetch(`/api/search?${params.toString()}`);
+
+            if (!response.ok) {
+                throw new Error(`HTTP ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            const items = normalizeSearchResponse(data);
+
+            hide('spinner');
+
+            if (items.length === 0) {
+                show('emptyState');
+                return;
+            }
+
+            document.getElementById('resultsCount').textContent = items.length;
+            document.getElementById('vacancyList').innerHTML = items.map(renderCard).join('');
+
+            show('resultsSection');
+
+        } catch (error) {
+            console.error(error);
+            hide('spinner');
+            show('errorBanner');
+        } finally {
+            searchButton.disabled = false;
+            searchButton.textContent = 'Найти';
+        }
+    }
+
+    function normalizeSearchResponse(data) {
+        if (Array.isArray(data)) {
+            return data;
+        }
+
+        let items = [];
+
+        for (const providerName in data) {
+            if (Array.isArray(data[providerName])) {
+                items = items.concat(data[providerName]);
+            }
+        }
+
+        return items;
+    }
+
+    function renderCard(v) {
+        const title = esc(v.position || 'Без названия');
+        const company = esc(v.companyName || 'Не указана');
+        const source = esc(v.source || 'Источник');
+        const url = safeUrl(v.sourceUrl);
+        const salary = formatSalary(v.salaryFrom, v.salaryTo, v.currency, v.salaryGross);
+        const workFormatBadge = renderWorkFormatBadge(v.workFormat, v.remote);
+        const skills = renderSkills(v.skills);
+        const description = getPreviewText(v);
+
+        return `
+            <article class="vacancy-card">
+                <div class="card-top">
+                    <a href="${url}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="vacancy-title">
+                        ${title}
+                    </a>
+
+                    ${salary ? `<span class="vacancy-salary">${salary}</span>` : ''}
+                </div>
+
+                <div class="card-meta">
+                    <span class="company">🏢 ${company}</span>
+
+                    ${v.location ? `<span class="meta-text">📍 ${esc(v.location)}</span>` : ''}
+                    ${v.experience ? `<span class="meta-text">💼 ${esc(v.experience)}</span>` : ''}
+
+                    <span class="badge badge-source">${source}</span>
+                    ${workFormatBadge}
+                </div>
+
+                ${description ? `<div class="description">${description}</div>` : ''}
+
+                ${skills}
+
+                <div class="card-actions">
+                    <a href="${url}"
+                       target="_blank"
+                       rel="noopener noreferrer"
+                       class="btn-open">
+                        Открыть на ${source} ↗
+                    </a>
+                </div>
+            </article>
+        `;
+    }
+
+    function renderWorkFormatBadge(workFormat, remote) {
+        const normalized = workFormat || (remote ? 'REMOTE' : 'UNKNOWN');
+
+        switch (normalized) {
+            case 'REMOTE':
+                return '<span class="badge badge-remote">Удалённо</span>';
+            case 'HYBRID':
+                return '<span class="badge badge-hybrid">Гибрид</span>';
+            case 'OFFICE':
+                return '<span class="badge badge-office">Офис</span>';
+            case 'FLEXIBLE':
+                return '<span class="badge badge-hybrid">Гибкий формат</span>';
+            default:
+                return '';
+        }
+    }
+
+    function renderSkills(skills) {
+        if (!Array.isArray(skills) || skills.length === 0) {
+            return '';
+        }
+
+        const visibleSkills = skills.slice(0, 8);
+
+        return `
+            <div class="skills">
+                ${visibleSkills.map(skill => `<span class="skill">${esc(skill)}</span>`).join('')}
+            </div>
+        `;
+    }
+
+    function getPreviewText(v) {
+        const text =
+            v.requirements ||
+            v.responsibilities ||
+            v.description ||
+            '';
+
+        if (!text) {
+            return '';
+        }
+
+        const clean = esc(text);
+
+        if (clean.length <= 240) {
+            return clean;
+        }
+
+        return clean.substring(0, 240) + '...';
+    }
+
+    function formatSalary(from, to, currency, salaryGross) {
+        if (from == null && to == null) {
+            return '';
+        }
+
+        const curr = formatCurrency(currency);
+        const fmt = value => new Intl.NumberFormat('ru-RU').format(value);
+
+        let salary = '';
+
+        if (from != null && to != null) {
+            salary = `${fmt(from)} — ${fmt(to)} ${curr}`;
+        } else if (from != null) {
+            salary = `от ${fmt(from)} ${curr}`;
+        } else {
+            salary = `до ${fmt(to)} ${curr}`;
+        }
+
+        if (salaryGross === true) {
+            salary += ' gross';
+        } else if (salaryGross === false) {
+            salary += ' net';
+        }
+
+        return salary;
+    }
+
+    function formatCurrency(currency) {
+        switch (currency) {
+            case 'RUR':
+            case 'RUB':
+                return '₽';
+            case 'USD':
+                return '$';
+            case 'EUR':
+                return '€';
+            default:
+                return currency || '';
+        }
+    }
+
+    function safeUrl(url) {
+        if (!url) {
+            return '#';
+        }
+
+        if (url.startsWith('http://') || url.startsWith('https://')) {
+            return escAttr(url);
+        }
+
+        return '#';
+    }
+
+    function esc(value) {
+        if (value == null) {
+            return '';
+        }
+
+        return String(value)
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/"/g, '&quot;')
+            .replace(/'/g, '&#039;');
+    }
+
+    function escAttr(value) {
+        return esc(value);
+    }
+
+    function show(id) {
+        document.getElementById(id).style.display = 'block';
+    }
+
+    function hide(id) {
+        document.getElementById(id).style.display = 'none';
+    }
+
+    document.getElementById('queryInput').focus();
+</script>
+
+</body>
+</html>
