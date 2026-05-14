@@ -9,20 +9,15 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 @Controller
 @RequiredArgsConstructor
-public class DashboardController {
+public class SearchPageController {
 
     private final AuthUtils authUtils;
 
-    @GetMapping("/")
-    public String root() {
-        return "redirect:/dashboard";
-    }
-
-    @GetMapping("/dashboard")
-    public String viewDashboard(Model model) {
+    @GetMapping("/search")
+    public String viewSearchPage(Model model) {
         User currentUser = authUtils.getCurrentUser();
         model.addAttribute("user", currentUser);
 
-        return "dashboard";
+        return "search";
     }
 }

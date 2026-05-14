@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="ru" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<nav class="navbar" th:fragment="navbar(activePage)">
+    <a href="/dashboard" class="navbar-brand">
+        <div class="logo-icon">💼</div>
+        <span>Job Assistant</span>
+    </a>
+
+    <div class="navbar-nav">
+        <a href="/dashboard"
+           class="nav-link"
+           th:classappend="${activePage == 'dashboard'} ? ' active' : ''">
+            Дашборд
+        </a>
+
+        <a href="/search"
+           class="nav-link"
+           th:classappend="${activePage == 'search'} ? ' active' : ''">
+            Поиск
+        </a>
+
+        <a href="/vacancies"
+           class="nav-link"
+           th:classappend="${activePage == 'vacancies'} ? ' active' : ''">
+            Мои вакансии
+        </a>
+    </div>
+
+    <div class="navbar-right">
+        <div class="user-info" th:if="${user != null}">
+            <img th:if="${user.picture != null}"
+                 th:src="${user.picture}"
+                 class="avatar"
+                 alt="Аватар"/>
+
+            <div th:if="${user.picture == null}" class="avatar-placeholder">
+                <span th:text="${user.name != null && !user.name.isBlank() ? user.name.substring(0,1).toUpperCase() : '?'}">
+                    ?
+                </span>
+            </div>
+
+            <span class="user-name" th:text="${user.name}">Пользователь</span>
+        </div>
+
+        <a href="/logout" class="logout-btn">Выйти</a>
+    </div>
+</nav>
+
+</body>
+</html>
